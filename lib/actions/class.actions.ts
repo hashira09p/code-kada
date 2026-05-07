@@ -130,6 +130,7 @@ export async function getStudentClasses(userId: string) {
  */
 export async function getTeacherClasses(teacherId: string) {
   try {
+    if (!teacherId) return [];
     const classes = await prisma.class.findMany({
       where: { teacherId },
       include: {

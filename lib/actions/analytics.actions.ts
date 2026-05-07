@@ -48,6 +48,8 @@ export async function getStudentAnalytics(userId: string) {
  */
 export async function getTeacherAnalytics(teacherId: string) {
   try {
+    if (!teacherId) return [];
+    
     const classes = await prisma.class.findMany({
       where: { teacherId },
       include: {
@@ -59,16 +61,18 @@ export async function getTeacherAnalytics(teacherId: string) {
       },
     });
 
+    if (!classes) return [];
+
     return classes.map((c) => ({
       name: c.name,
-      students: c._count.members,
-      avgFocus: c.sessions.length > 0 
+      students: c._count?.members || 0,
+      avgFocus: (c.sessions && c.sessions.length > 0)
         ? Math.round(c.sessions.reduce((acc, s) => acc + (s.focusScore || 0), 0) / c.sessions.length) 
         : 0,
-      totalTime: c.sessions.reduce((acc, s) => acc + s.actualDuration, 0),
+      totalTime: c.sessions ? c.sessions.reduce((acc, s) => acc + (s.actualDuration || 0), 0) : 0,
     }));
   } catch (error) {
-    console.error("Failed to fetch teacher analytics:", error);
+    console.error("CRITICAL: Failed to fetch teacher analytics:", error);
     return [];
   }
 }
