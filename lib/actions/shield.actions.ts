@@ -15,6 +15,25 @@ export async function getFocusPolicy(classId: string) {
   }
 }
 
+export async function getUserFocusPolicy(userId: string) {
+  try {
+    const policies = await prisma.focusPolicy.findMany({
+      where: {
+        class: {
+          teacherId: userId
+        }
+      },
+      select: { domains: true }
+    });
+
+    const allDomains = Array.from(new Set(policies.flatMap(p => p.domains)));
+    return { domains: allDomains };
+  } catch (error) {
+    console.error("Failed to fetch user focus policy:", error);
+    return { domains: [] };
+  }
+}
+
 export async function updateFocusPolicy(classId: string, domains: string[]) {
   try {
     const policy = await prisma.focusPolicy.upsert({

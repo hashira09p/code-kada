@@ -72,6 +72,7 @@ export default function PomodoroTimer({ userId, classId }: PomodoroTimerProps) {
     isActive: isActive && mode === "focus",
     isStrictMode: isStrictMode,
     classId: classId,
+    userId: userId,
   });
 
   // Initialize audio
@@ -109,7 +110,7 @@ export default function PomodoroTimer({ userId, classId }: PomodoroTimerProps) {
     setIsActive(false);
     
     // Notify extension that timer is finished
-    window.dispatchEvent(new CustomEvent("FOCUSFORGE_TIMER_FINISHED"));
+    window.postMessage({ type: "FOCUSFORGE_TIMER_FINISHED" }, "*");
     
     if (mode === "focus") {
       setSessionsCompleted(prev => prev + 1);

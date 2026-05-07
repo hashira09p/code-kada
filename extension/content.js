@@ -4,18 +4,23 @@ const isFocusForgeApp = window.location.hostname === "localhost" ||
                        window.location.href.includes("focusforge");
 
 if (isFocusForgeApp) {
-  // Listen for state changes from the app
-  window.addEventListener("FOCUSFORGE_TIMER_STATE", (event) => {
-    chrome.runtime.sendMessage({ 
-      type: "SET_FOCUS_MODE", 
-      active: event.detail.active,
-      domains: event.detail.domains
-    });
-  });
+  // Listen for state changes from the app via postMessage
+  window.addEventListener("message", (event) => {
+    // Only accept messages from the window itself
+    if (event.source !== window) return;
 
-  // Listen for timer finished from the app
-  window.addEventListener("FOCUSFORGE_TIMER_FINISHED", () => {
-    chrome.runtime.sendMessage({ type: "TIMER_FINISHED" });
+    if (event.data && event.data.type === "FOCUSFORGE_TIMER_STATE") {
+      console.log("[FocusForge] Received State Update:", event.data);
+      chrome.runtime.sendMessage({ 
+        type: "SET_FOCUS_MODE", 
+        active: event.data.active,
+        domains: event.data.domains
+      });
+    }
+
+    if (event.data && event.data.type === "FOCUSFORGE_TIMER_FINISHED") {
+      chrome.runtime.sendMessage({ type: "TIMER_FINISHED" });
+    }
   });
 }
 

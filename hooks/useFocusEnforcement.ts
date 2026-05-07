@@ -2,16 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { getFocusPolicy } from "@/lib/actions/shield.actions";
+import { getFocusPolicy, getUserFocusPolicy } from "@/lib/actions/shield.actions";
 
 interface FocusEnforcementProps {
   isActive: boolean;
   isStrictMode: boolean;
   classId?: string;
+  userId?: string;
   onViolation?: () => void;
 }
 
-export function useFocusEnforcement({ isActive, isStrictMode, classId, onViolation }: FocusEnforcementProps) {
+export function useFocusEnforcement({ isActive, isStrictMode, classId, userId, onViolation }: FocusEnforcementProps) {
   const [isTabFocused, setIsTabFocused] = useState(true);
 
   useEffect(() => {
@@ -24,16 +25,22 @@ export function useFocusEnforcement({ isActive, isStrictMode, classId, onViolati
         if (policy && policy.domains.length > 0) {
           domains = policy.domains.filter(d => d.trim() !== "");
         }
+      } else if (userId) {
+        // For Teacher's personal Pomodoro, use all their class policies combined
+        const policy = await getUserFocusPolicy(userId);
+        if (policy && policy.domains.length > 0) {
+          domains = policy.domains.filter(d => d.trim() !== "");
+        }
       }
 
       // Notify the Chrome Extension (if installed)
       // Shield (blurring) should ONLY be active if both the timer is running AND strict mode is ON
-      window.dispatchEvent(new CustomEvent("FOCUSFORGE_TIMER_STATE", {
-        detail: { 
-          active: isActive && isStrictMode,
-          domains: domains
-        }
-      }));
+      // Shield (blurring) should ONLY be active if both the timer is running AND strict mode is ON
+      window.postMessage({
+        type: "FOCUSFORGE_TIMER_STATE",
+        active: isActive && isStrictMode,
+        domains: domains
+      }, "*");
     };
 
     notifyExtension();
@@ -77,9 +84,11 @@ export function useFocusEnforcement({ isActive, isStrictMode, classId, onViolati
       window.removeEventListener("focus", handleFocus);
       
       // Cleanup: Notify extension that focus is inactive when leaving the page
-      window.dispatchEvent(new CustomEvent("FOCUSFORGE_TIMER_STATE", {
-        detail: { active: false, domains: [] }
-      }));
+      window.postMessage({
+        type: "FOCUSFORGE_TIMER_STATE",
+        active: false,
+        domains: []
+      }, "*");
     };
   }, [isActive, isStrictMode, onViolation]);
 
