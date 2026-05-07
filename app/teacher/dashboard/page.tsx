@@ -7,7 +7,17 @@ import CreateClassModal from "@/components/teacher/CreateClassModal";
 import { Users, TrendingUp, Trophy, LogOut, Loader2, BookOpen } from "lucide-react";
 import { getTeacherAnalytics } from "@/lib/actions/analytics.actions";
 import { getTeacherClasses } from "@/lib/actions/class.actions";
-import { ClassPerformanceChart, ClassEnrollmentChart } from "@/components/teacher/TeacherAnalytics";
+import dynamic from "next/dynamic";
+
+const ClassPerformanceChart = dynamic(
+  () => import("@/components/teacher/TeacherAnalytics").then((mod) => mod.ClassPerformanceChart),
+  { ssr: false }
+);
+
+const ClassEnrollmentChart = dynamic(
+  () => import("@/components/teacher/TeacherAnalytics").then((mod) => mod.ClassEnrollmentChart),
+  { ssr: false }
+);
 import Link from "next/link";
 
 export default function TeacherDashboard() {
