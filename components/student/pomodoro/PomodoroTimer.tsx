@@ -217,7 +217,7 @@ export default function PomodoroTimer({ userId, classId }: PomodoroTimerProps) {
       <div className="relative group">
         <div className={`absolute -inset-0.5 bg-gradient-to-br ${MODE_CONFIG[mode].gradient} rounded-[3rem] blur-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-500`} />
         
-        <div className="relative bg-card backdrop-blur-2xl border border-border rounded-[2.5rem] p-10 flex flex-col items-center shadow-xl">
+        <div className="relative bg-card/80 backdrop-blur-2xl border border-border rounded-[2.5rem] p-10 flex flex-col items-center shadow-xl">
           {/* Progress Circle SVG */}
           <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
             <svg className="w-full h-full transform -rotate-90">
