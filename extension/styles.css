@@ -1,9 +1,11 @@
 /* styles.css */
-.focusforge-distraction body {
-  filter: blur(15px) grayscale(100%);
+html.focusforge-distraction,
+html.focusforge-distraction body {
+  filter: blur(25px) grayscale(100%) brightness(0.7) !important;
   pointer-events: none !important;
   user-select: none !important;
   overflow: hidden !important;
+  transition: filter 0.5s ease-in-out !important;
 }
 
 #focusforge-shield-overlay {

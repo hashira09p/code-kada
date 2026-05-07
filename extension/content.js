@@ -1,7 +1,9 @@
 // 1. Communication with FocusForge Web App
 const isFocusForgeApp = window.location.hostname === "localhost" || 
                        window.location.hostname === "127.0.0.1" ||
-                       window.location.href.includes("focusforge");
+                       window.location.hostname.includes("vercel.app") ||
+                       window.location.href.includes("focus-forge") ||
+                       window.location.href.includes("code-kada");
 
 if (isFocusForgeApp) {
   // Listen for state changes from the app via postMessage
@@ -63,8 +65,9 @@ function updateBlur(active, domains = []) {
   }
 
   const isDistraction = distractionList.some(d => {
-    const blocked = d.toLowerCase().trim();
-    return currentHostname === blocked || currentHostname.endsWith("." + blocked);
+    const blocked = d.toLowerCase().trim().replace(/^(https?:\/\/)?(www\.)?/, "");
+    const host = currentHostname.replace(/^www\./, "");
+    return host === blocked || host.endsWith("." + blocked) || blocked.endsWith("." + host);
   });
 
   if (active && isDistraction) {
